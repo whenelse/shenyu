@@ -21,6 +21,7 @@ import org.apache.shenyu.admin.register.client.server.api.ShenyuClientServerRegi
 import org.apache.shenyu.admin.utils.ShenyuResultMessage;
 import org.apache.shenyu.common.enums.RpcTypeEnum;
 import org.apache.shenyu.common.utils.GsonUtils;
+import org.apache.shenyu.register.common.dto.ApiDocRegisterDTO;
 import org.apache.shenyu.register.common.dto.MetaDataRegisterDTO;
 import org.apache.shenyu.register.common.dto.URIRegisterDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,6 +92,32 @@ public final class ShenyuHttpRegistryControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/shenyu-client/register-uri")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GsonUtils.getInstance().toJson(uriRegisterDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(ShenyuResultMessage.SUCCESS))
+                .andReturn();
+    }
+
+    @Test
+    public void registerApiDoc() throws Exception {
+        ApiDocRegisterDTO apiDocRegisterDTO = ApiDocRegisterDTO.builder()
+                .contextPath("/http")
+                .apiPath("/http/test")
+                .httpMethod(0)
+                .consume("*/*")
+                .produce("*/*")
+                .version("v0.01")
+                .rpcType("http")
+                .state(0)
+                .ext("{}")
+                .apiOwner("admin")
+                .apiDesc("test")
+                .apiSource(1)
+                .document("")
+                .build();
+        doNothing().when(publisher).publish(apiDocRegisterDTO);
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/shenyu-client/register-apiDoc")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(GsonUtils.getInstance().toJson(apiDocRegisterDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(ShenyuResultMessage.SUCCESS))
                 .andReturn();
